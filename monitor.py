@@ -20,6 +20,7 @@
 # along with System-Monitoring-Daemon.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+import threading
 from socket import *
 
 HOST = ''
@@ -31,7 +32,26 @@ MAX_QUEUE = 5
 
 class Stats:
 	def __init__(self):
+		self.read_lock = threading.Lock()
+		self.write_lock = threading.Lock()
+
 		self.cpu_load = 50
+
+	def acquire_read(self):
+		self.read_lock.acquire()
+		self.write_lock.acquire()
+
+	def release_read(self):
+		self.write_lock.release()
+		self.read_lock.release()
+
+	def acquire_write(self):
+		self.write_lock.acquire()
+
+	def release_write(self):
+		self.write_lock.release()
+		
+	
 
 class ClientHandler:
 	def __init__(self, stats):
