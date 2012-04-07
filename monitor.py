@@ -22,6 +22,8 @@
 
 from socket import *
 
+from sensors.cpu import *
+
 HOST = ''
 PORT = 6000
 ADDR = (HOST, PORT)
@@ -31,14 +33,23 @@ MAX_QUEUE = 5
 
 class Stats:
 	def __init__(self):
-		self.cpu_load = 50
+		self.sensors = []
+		self.sensors.append(cpu_monitor())
+
+	def getStats(self):
+		message = ''
+		for s in self.sensors:
+			s.update()
+			message += '{'+s.getFormatedData()+'}'
+		return message
+		
 
 class ClientHandler:
 	def __init__(self, stats):
 		self.stats = stats
 
 	def handle(self, sock):	
-		conn_sock.send('{ cpu_load: %d}' % (self.stats.cpu_load))
+		conn_sock.send( self.stats.getStats() )
 		conn_sock.close()
 
 stats = Stats()
