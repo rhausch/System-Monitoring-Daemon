@@ -8,8 +8,7 @@
 #
 # System-Monitoring-Daemon is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# the Free Software Foundation, version 3 of the License.
 #
 # System-Monitoring-Daemon is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +23,9 @@ import threading
 from socket import *
 import time
 
-from sensors.cpu import *
-from sensors.memory import *
+#from sensors.cpu import *
+#from sensors.memory import *
+import sensors
 
 HOST = ''
 PORT = 6000
@@ -39,9 +39,9 @@ class Stats():
 		self.read_lock = threading.Lock()
 		self.write_lock = threading.Lock()
 
-		self.sensors = []
-		self.sensors.append(cpu_monitor())
-		self.sensors.append(mem_monitor())
+		self.sensors = sensors.sensors #[]
+		#self.sensors.append(cpu_monitor())
+		#self.sensors.append(mem_monitor())
 		
 		self.stop = threading.Event()
 		t = threading.Thread(target=self.update_loop, args=())

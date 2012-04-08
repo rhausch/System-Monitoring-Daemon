@@ -1,5 +1,6 @@
-# Sensors Module
-#	Load appropriate sensor sub module to monitor system with
+#!/usr/bin/python
+#
+# Memory monitor ontop of psutil
 #
 # Copyright 2012 Dan Ballard and Robert Hausch
 #
@@ -21,18 +22,19 @@
 ##
 
 
-# Load appropriate sensor code
+import psutil
 
-has_psutil = False
-try:
-	import psutil
-	has_psutil = True
-except:
-	None
+class mem_monitor:
+	def __init__(self):
+		self.mem_usage = ''
+		self.virt_mem_usage = ''
 
-sensors = []
+	def update(self):
+		self.mem_usage = psutil.phymem_usage()
+		self.virt_mem_usage = psutil.virtmem_usage()
 
-if has_psutil:
-	from psutil_sensors import *
-	sensors.append(cpu.cpu_monitor())
-	sensors.append(memory.mem_monitor())
+	def getFormatedData(self):
+		message = '{"type": "Memory", "value": "%.1f", "data": [{"name": "Physical", "value": "%.1f"},{"name": "Virtual", "value": "%.1f"}]}' % (self.mem_usage.percent, self.mem_usage.percent, self.virt_mem_usage.percent)
+		return message
+
+
