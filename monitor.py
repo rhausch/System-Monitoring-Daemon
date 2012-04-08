@@ -24,6 +24,7 @@ import threading
 from socket import *
 
 from sensors.cpu import *
+from sensors.memory import *
 
 HOST = ''
 PORT = 6000
@@ -39,6 +40,7 @@ class Stats:
 
 		self.sensors = []
 		self.sensors.append(cpu_monitor())
+		self.sensors.append(mem_monitor())
 
 	def getStats(self):
 		message = ''
