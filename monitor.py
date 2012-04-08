@@ -43,10 +43,12 @@ class Stats:
 		self.sensors.append(mem_monitor())
 
 	def getStats(self):
-		message = ''
+		data = []
 		for s in self.sensors:
 			s.update()
-			message += '{'+s.getFormatedData()+'}'
+			data.append(s.getFormatedData())
+		message = '{"Stats":['+','.join('%s'%x for x in data)+']}'
+		
 		return message
 		
 
