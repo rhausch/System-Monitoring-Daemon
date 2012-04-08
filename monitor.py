@@ -53,7 +53,7 @@ class Stats():
 			for s in self.sensors:
 				s.update()
 			self.release_write()
-			time.sleep(1)
+			time.sleep(0.1)
 
 	def getStats(self):
 		data = []

@@ -12,7 +12,7 @@ class mem_monitor:
 		self.virt_mem_usage = psutil.virtmem_usage()
 
 	def getFormatedData(self):
-		message = '{"type": "Memory", "value": "%.1f", "data": [{"name": "Physical", "value": "%.1f"},{"name": "Virtual", "value": "%.1f"}]}' % (self.mem_usage.percent, self.mem_usage.percent, self.virt_mem_usage.percent)
+		message = '{"type": "Memory", "value": %.1f, "data": [{"name": "Physical", "value": "%.1f"},{"name": "Virtual", "value": "%.1f"}]}' % (self.mem_usage.percent, self.mem_usage.percent, self.virt_mem_usage.percent)
 		return message
 
 
