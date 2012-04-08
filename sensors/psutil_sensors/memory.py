@@ -31,6 +31,8 @@ class mem_monitor:
 
 	def update(self):
 		self.mem_usage = psutil.phymem_usage()
+		self.mem_usage['buffers'] = psutil.phymem_buffers()
+		self.mem_usage['cached'] = psutil.cached_phymem()
 		self.virt_mem_usage = psutil.virtmem_usage()
 
 	def getFormatedData(self):
