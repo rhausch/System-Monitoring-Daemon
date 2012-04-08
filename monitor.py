@@ -22,6 +22,7 @@
 
 import threading
 from socket import *
+import time
 
 from sensors.cpu import *
 from sensors.memory import *
@@ -33,7 +34,7 @@ BUFSIZE = 4096
 MAX_QUEUE = 5
 
 
-class Stats:
+class Stats():
 	def __init__(self):
 		self.read_lock = threading.Lock()
 		self.write_lock = threading.Lock()
@@ -41,15 +42,29 @@ class Stats:
 		self.sensors = []
 		self.sensors.append(cpu_monitor())
 		self.sensors.append(mem_monitor())
+		
+		self.stop = threading.Event()
+		t = threading.Thread(target=self.update_loop, args=())
+		t.start()
+
+	def update_loop(self):
+		while not self.stop.isSet():
+			self.acquire_write()
+			for s in self.sensors:
+				s.update()
+			self.release_write()
+			time.sleep(1)
+
+
 
 	def getStats(self):
 		message = ''
 		for s in self.sensors:
-			s.update()
+			self.acquire_read()
 			message += '{'+s.getFormatedData()+'}'
+			self.release_read()
 		return message
 		
-
 	def acquire_read(self):
 		self.read_lock.acquire()
 		self.write_lock.acquire()
@@ -74,7 +89,9 @@ class ClientHandler:
 		conn_sock.send( self.stats.getStats() )
 		conn_sock.close()
 
+
 stats = Stats()
+
 	
 serv_sock = socket(AF_INET, SOCK_STREAM)
 # Behave better after crash
@@ -89,7 +106,7 @@ while 1:
 	try:
 		(conn_sock,addr) = serv_sock.accept()
 	except KeyboardInterrupt:
-		print "exiting..."
+		print "\nExiting..."
 		break;
 	except:
 		conn_sock = 0
@@ -99,6 +116,6 @@ while 1:
 		client = ClientHandler(stats)
 		client.handle(conn_sock)
 
-
+stats.stop.set()
 serv_sock.close()
 
