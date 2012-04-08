@@ -55,14 +55,14 @@ class Stats():
 			self.release_write()
 			time.sleep(1)
 
-
-
 	def getStats(self):
-		message = ''
+		data = []
+		self.acquire_read()
 		for s in self.sensors:
-			self.acquire_read()
-			message += '{'+s.getFormatedData()+'}'
-			self.release_read()
+			data.append(s.getFormatedData())
+		message = '{"Stats":['+','.join('%s'%x for x in data)+']}'
+		
+		self.release_read()
 		return message
 		
 	def acquire_read(self):
