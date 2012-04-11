@@ -30,13 +30,15 @@ class mem_monitor:
 		self.virt_mem_usage = ''
 
 	def update(self):
-		self.mem_usage = psutil.phymem_usage()
-		#self.mem_usage['buffers'] = psutil.phymem_buffers()
-		#self.mem_usage['cached'] = psutil.cached_phymem()
-		self.virt_mem_usage = psutil.virtmem_usage()
+		phys_mem = psutil.phymem_usage()
+		self.mem_usage = {'total': phys_mem.total, 'used': phys_mem.used, 
+				'free': phys_mem.free, 'percent': phys_mem.percent,
+				'buffers': psutil.phymem_buffers(),
+				'cached': psutil.cached_phymem()}
+		virt_mem = psutil.virtmem_usage()
+		self.swap_usage = {'total': virt_mem.total, 'used': virt_mem.used, 'free': virt_mem.free, 'percent': virt_mem.percent}
 
 	def getFormatedData(self):
-		message = '{"type": "Memory", "value": %.1f, "data": [{"name": "Physical", "value": "%.1f"},{"name": "Virtual", "value": "%.1f"}]}' % (self.mem_usage.percent, self.mem_usage.percent, self.virt_mem_usage.percent)
-		return message
+		return {'memory': self.mem_usage, 'swap': self.swap_usage}
 
 

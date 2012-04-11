@@ -22,6 +22,7 @@
 import threading
 from socket import *
 import time
+import json
 
 #from sensors.cpu import *
 #from sensors.memory import *
@@ -56,14 +57,12 @@ class Stats():
 			time.sleep(0.1)
 
 	def getStats(self):
-		data = []
+		data = {}
 		self.acquire_read()
 		for s in self.sensors:
-			data.append(s.getFormatedData())
-		message = '{"Stats":['+','.join('%s'%x for x in data)+']}'
-		
+			data.update(s.getFormatedData())
 		self.release_read()
-		return message
+		return json.dumps(data)
 		
 	def acquire_read(self):
 		self.read_lock.acquire()
@@ -98,8 +97,13 @@ serv_sock = socket(AF_INET, SOCK_STREAM)
 serv_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
 
-serv_sock.bind((ADDR)) #tuple with one param
-serv_sock.listen(MAX_QUEUE)
+try:
+	serv_sock.bind((ADDR)) #tuple with one param
+	serv_sock.listen(MAX_QUEUE)
+except Exception as err: 
+	print "Error: ", type(err), ': ', err
+	stats.stop.set()
+	exit(0)
 
 
 while 1:
